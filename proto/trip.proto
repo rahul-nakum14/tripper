@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package trip;
+
+service TripService {
+  rpc CreateTrip (CreateTripRequest) returns (TripResponse);
+  rpc GetTrip (GetTripRequest) returns (TripResponse);
+  rpc UpdateTripStatus (UpdateTripStatusRequest) returns (TripResponse);
+  rpc AssignDriver (AssignDriverRequest) returns (TripResponse);
+  rpc CancelTrip (CancelTripRequest) returns (TripResponse);
+}
+
+message CreateTripRequest {
+  string passenger_id = 1;
+  string ride_type = 2;
+  double pickup_latitude = 3;
+  double pickup_longitude = 4;
+  string pickup_address = 5;
+  double destination_latitude = 6;
+  double destination_longitude = 7;
+  string destination_address = 8;
+}
+
+message GetTripRequest {
+  string id = 1;
+}
+
+message UpdateTripStatusRequest {
+  string trip_id = 1;
+  string status = 2;
+  map<string, string> metadata = 3;
+}
+
+message AssignDriverRequest {
+  string trip_id = 1;
+  string driver_id = 2;
+  double fare = 3;
+  double eta_minutes = 4;
+  string currency = 5;
+}
+
+message CancelTripRequest {
+  string trip_id = 1;
+  string reason = 2;
+  string source = 3;
+}
+
+message TripResponse {
+  string id = 1;
+  string passenger_id = 2;
+  string driver_id = 3;
+  string status = 4;
+  string ride_type = 5;
+  double pickup_latitude = 6;
+  double pickup_longitude = 7;
+  string pickup_address = 8;
+  double destination_latitude = 9;
+  double destination_longitude = 10;
+  string destination_address = 11;
+  double fare = 12;
+  string currency = 13;
+  double distance_km = 14;
+  double duration_minutes = 15;
+  string cancellation_reason = 16;
+  string cancellation_source = 17;
+  string created_at = 18;
+  string updated_at = 19;
+}
