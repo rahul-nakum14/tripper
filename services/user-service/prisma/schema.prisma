@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String          @id @default(uuid())
+  email        String          @unique
+  phone        String          @unique
+  firstName    String          @map("first_name")
+  lastName     String          @map("last_name")
+  passwordHash String          @map("password_hash")
+  role         String          @default("PASSENGER")
+  isVerified   Boolean         @default(false) @map("is_verified")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  paymentMethods PaymentMethod[]
+
+  @@map("users")
+}
+
+model PaymentMethod {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  type       String
+  lastFour   String   @map("last_four")
+  expiryDate String?  @map("expiry_date")
+  isDefault  Boolean  @default(false) @map("is_default")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payment_methods")
+}
