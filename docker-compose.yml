@@ -93,3 +93,44 @@ services:
       test: pg_isready -U ride -d notification_service
       interval: 5s
       retries: 5
+
+  user-service:
+    build:
+      context: .
+      dockerfile: docker/services/user-service.Dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      NODE_ENV: development
+      GRPC_PORT: 50051
+      DATABASE_URL: postgresql://ride:ride_pass@user-db:5432/user_service
+      KAFKA_BROKER: kafka:9092
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-dev-secret}
+    depends_on:
+      user-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: docker/services/api-gateway.Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-dev-secret}
+      JWT_EXPIRATION: 1h
+      USER_SERVICE_GRPC_URL: user-service:50051
+      KAFKA_BROKER: kafka:9092
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
